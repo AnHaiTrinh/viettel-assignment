@@ -13,7 +13,7 @@ services:
     healthcheck:
       test: nc -z zookeeper 2181 || exit -1
       start_period: 15s
-      interval: 5s
+      interval: 10s
       timeout: 10s
       retries: 10
   
@@ -101,7 +101,7 @@ services:
     healthcheck:
       test: nc -z kc01 8083 || exit -1
       start_period: 15s
-      interval: 5s
+      interval: 10s
       timeout: 10s
       retries: 10
 
@@ -138,9 +138,9 @@ services:
       - 9870:9870
       - 9000:9000
     volumes:
-      - ./hadoop/hadoop_namenode:/hadoop/dfs/name
-      - ./hadoop/hadoop_home:/home
-      - ./hadoop/submit:/submit
+      - ./hadoop_volume/hadoop_namenode:/hadoop/dfs/name
+      - ./hadoop_volume/hadoop_home:/home
+      - ./hadoop_volume/submit:/submit
     environment:
       - CLUSTER_NAME=test
     env_file:
@@ -150,7 +150,7 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode1
     volumes:
-      - ./hadoop/hadoop_datanode1:/hadoop/dfs/data
+      - ./hadoop_volume/hadoop_datanode1:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
@@ -160,17 +160,23 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode2
     volumes:
-      - ./hadoop/hadoop_datanode2:/hadoop/dfs/data
+      - ./hadoop_volume/hadoop_datanode2:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
       - ./hadoop/hadoop.env
 
+  spark-notebook:
+    image: jupyter/pyspark-notebook:spark-3.2.1
+    container_name: spark-notebook
+    ports:
+      - 8888:8888
+
   # datanode3:
   #   image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
   #   container_name: datanode3
   #   volumes:
-  #     - ./hadoop/hadoop_datanode3:/hadoop/dfs/data
+  #     - ./hadoop_volume/hadoop_datanode3:/hadoop/dfs/data
   #   environment:
   #     SERVICE_PRECONDITION: "namenode:9870"
   #   env_file:
